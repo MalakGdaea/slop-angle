@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الميل وزاوية الميل</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: graph-paper notebook — a live protractor-plane hero, a lesson column, then a practice desk */
+:root{
+  --paper:#f4f7f6; --sheet:#ffffff; --ink:#14232a; --muted:#5b6d73;
+  --grid:#d7e3e4; --axis:#8aa1a6;
+  --line:#c2410c; --leg:#1d5fb8; --soft:#e8eff0;
+  --ok:#15803d; --okbg:#e3f4e8; --bad:#b42318; --badbg:#fbe7e5;
+  --f-display:"Reem Kufi","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f171a; --sheet:#152126; --ink:#e3ecee; --muted:#93a8ad;
+  --grid:#22333a; --axis:#4d666d; --line:#f0773f; --leg:#6aa8f5; --soft:#1b2b31;
+  --ok:#5fd38a; --okbg:#143222; --bad:#ff8a80; --badbg:#3a1a18; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#0f171a; --sheet:#152126; --ink:#e3ecee; --muted:#93a8ad;
+  --grid:#22333a; --axis:#4d666d; --line:#f0773f; --leg:#6aa8f5; --soft:#1b2b31;
+  --ok:#5fd38a; --okbg:#143222; --bad:#ff8a80; --badbg:#3a1a18; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:48px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.3;text-wrap:balance;margin:0}
+h1{font-size:clamp(2rem,5vw,3rem)}
+h2{font-size:1.65rem}
+h3{font-size:1.15rem}
+p{margin:0}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:var(--f-num);font-weight:500}
+.eyebrow{font-size:.8rem;letter-spacing:.04em;color:var(--muted);font-weight:500}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:32px;align-items:center}
+.hero-text{display:flex;flex-direction:column;gap:16px;min-width:0}
+.formula{font-family:var(--f-num);font-size:clamp(1.8rem,4vw,2.6rem);font-weight:700;direction:ltr;text-align:right}
+.formula b{color:var(--line)}
+.plane{background:var(--sheet);border:1px solid var(--grid);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+canvas{width:100%;display:block;touch-action:none;border-radius:8px}
+#hero-canvas{aspect-ratio:1/0.8;cursor:grab}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.readout div{background:var(--soft);border-radius:8px;padding:6px 10px;display:flex;flex-direction:column}
+.readout span{font-size:.75rem;color:var(--muted)}
+.readout strong{font-family:var(--f-num);font-size:1.15rem;direction:ltr;text-align:right}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.85rem;font-weight:700;background:var(--soft)}
+input[type=range]{width:100%;accent-color:var(--line)}
+.slider-row{display:flex;gap:12px;align-items:center}
+.slider-row label{font-size:.85rem;color:var(--muted);white-space:nowrap}
+
+/* lesson */
+.lesson{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.block{display:flex;flex-direction:column;gap:12px;min-width:0}
+.block ul,.block ol{margin:0;padding-inline-start:22px;display:flex;flex-direction:column;gap:6px}
+.cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.case{border:1px solid var(--grid);border-radius:10px;padding:10px 12px;background:var(--sheet);display:flex;flex-direction:column;gap:2px}
+.case strong{font-family:var(--f-display);font-size:1rem}
+.case small{color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;background:var(--sheet)}
+th,td{border:1px solid var(--grid);padding:6px 8px;text-align:center;white-space:nowrap}
+th{background:var(--soft);font-weight:500}
+td .ltr{font-size:.95rem}
+.example{background:var(--sheet);border:1px solid var(--grid);border-inline-start:4px solid var(--leg);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.note{color:var(--muted);font-size:.92rem}
+
+/* practice */
+.practice{background:var(--sheet);border:1px solid var(--grid);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:.9rem;border:1px solid var(--grid);background:var(--paper);color:var(--ink);border-radius:99px;padding:5px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--leg);outline-offset:2px}
+.group{display:flex;flex-direction:column;gap:6px}
+.group > span{font-size:.8rem;color:var(--muted)}
+.score{display:flex;gap:16px;font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.score div{display:flex;flex-direction:column;align-items:center;min-width:56px}
+.score span{font-family:var(--f-body);font-size:.75rem;color:var(--muted)}
+.score strong{font-size:1.3rem}
+.q-area{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
+.q-card{display:flex;flex-direction:column;gap:14px;min-width:0}
+.q-type{font-size:.82rem;color:var(--muted)}
+.q-text{font-size:1.2rem;font-weight:500}
+.q-text .ltr{font-size:1.15rem}
+.answer-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#answer{font-family:var(--f-num);font-size:1.15rem;direction:ltr;text-align:left;padding:8px 12px;border:2px solid var(--grid);border-radius:10px;background:var(--paper);color:var(--ink);width:180px;max-width:100%}
+.unit{font-family:var(--f-num);color:var(--muted)}
+.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:9px 18px;cursor:pointer;background:var(--line);color:#fff}
+.btn.secondary{background:var(--soft);color:var(--ink)}
+.mc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mc button{font:inherit;padding:10px;border:2px solid var(--grid);border-radius:10px;background:var(--paper);color:var(--ink);cursor:pointer}
+.mc button.right{border-color:var(--ok);background:var(--okbg)}
+.mc button.wrong{border-color:var(--bad);background:var(--badbg)}
+.feedback{border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.feedback.ok{background:var(--okbg);color:var(--ink)}
+.feedback.ok > strong{color:var(--ok)}
+.feedback.bad{background:var(--badbg);color:var(--ink)}
+.feedback.bad > strong{color:var(--bad)}
+.hint{background:var(--soft);border-radius:10px;padding:10px 14px;font-size:.95rem}
+.steps{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:2px}
+.mini{background:var(--paper);border:1px solid var(--grid);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.mini canvas{aspect-ratio:1/1}
+.mini p{font-size:.8rem;color:var(--muted);text-align:center}
+.tip{font-size:.85rem;color:var(--muted)}
+
+@media (max-width:760px){
+  .hero,.lesson,.q-area{grid-template-columns:minmax(0,1fr)}
+  .cases{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+@media (max-width:420px){ .mc{grid-template-columns:minmax(0,1fr)} .readout strong{font-size:1rem} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap" dir="rtl" lang="ar">
+
+<section class="hero">
+  <div class="hero-text">
+    <span class="eyebrow">الهندسة التحليلية · المستقيم</span>
+    <h1>الميل وزاوية الميل</h1>
+    <div class="formula">m = tan <b>α</b></div>
+    <p>زاوية الميل <span class="ltr">α</span> هي الزاوية التي يصنعها المستقيم مع الاتجاه الموجب لمحور <span class="ltr">x</span>، وتُقاس عكس اتجاه عقارب الساعة. ظلّ هذه الزاوية يساوي ميل المستقيم.</p>
+    <p class="note">حرّك المستقيم بإصبعك أو بالفأرة، أو استعمل المؤشر، وراقب كيف يتغيّر الميل.</p>
+  </div>
+  <div class="plane">
+    <canvas id="hero-canvas" aria-label="مستوى إحداثيات تفاعلي يظهر مستقيماً وزاوية ميله"></canvas>
+    <div class="slider-row">
+      <label for="alpha">الزاوية α</label>
+      <input type="range" id="alpha" min="0" max="179" step="1" value="35">
+    </div>
+    <div class="readout">
+      <div><span>الزاوية α</span><strong id="r-alpha">35°</strong></div>
+      <div><span>الميل m = Δy / Δx</span><strong id="r-m">0.70</strong></div>
+      <div><span>نوع الزاوية</span><strong id="r-type" style="font-family:var(--f-body);direction:rtl">حادة · m &gt; 0</strong></div>
+    </div>
+  </div>
+</section>
+
+<section class="lesson">
+  <div class="block">
+    <h2>ماذا تخبرنا الزاوية؟</h2>
+    <p>المجال المسموح لزاوية الميل هو <span class="ltr">0° ≤ α &lt; 180°</span>. نوع الزاوية يحدد إشارة الميل:</p>
+    <div class="cases">
+      <div class="case"><strong>زاوية حادة</strong><span class="ltr">0° &lt; α &lt; 90°</span><small>الميل موجب، المستقيم صاعد</small></div>
+      <div class="case"><strong>زاوية منفرجة</strong><span class="ltr">90° &lt; α &lt; 180°</span><small>الميل سالب، المستقيم نازل</small></div>
+      <div class="case"><strong>زاوية صفر</strong><span class="ltr">α = 0°</span><small>الميل صفر، مستقيم أفقي</small></div>
+      <div class="case"><strong>زاوية قائمة</strong><span class="ltr">α = 90°</span><small>الميل غير معرّف، مستقيم عمودي</small></div>
+    </div>
+    <h3>زوايا خاصة يجب حفظها</h3>
+    <div class="tbl-wrap">
+      <table>
+        <tr><th>α</th><td><span class="ltr">0°</span></td><td><span class="ltr">30°</span></td><td><span class="ltr">45°</span></td><td><span class="ltr">60°</span></td><td><span class="ltr">120°</span></td><td><span class="ltr">135°</span></td><td><span class="ltr">150°</span></td></tr>
+        <tr><th>m</th><td><span class="ltr">0</span></td><td><span class="ltr">1/√3</span></td><td><span class="ltr">1</span></td><td><span class="ltr">√3</span></td><td><span class="ltr">−√3</span></td><td><span class="ltr">−1</span></td><td><span class="ltr">−1/√3</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>الاتجاهان في الحل</h2>
+    <h3>من الزاوية إلى الميل</h3>
+    <p>نعوّض في <span class="ltr">m = tan α</span> مباشرة بالآلة الحاسبة (بوضع الدرجات <span class="ltr">DEG</span>).</p>
+    <div class="example"><span class="note">مثال</span><span><span class="ltr">α = 72°  ⇒  m = tan 72° ≈ 3.08</span></span></div>
+    <h3>من الميل إلى الزاوية</h3>
+    <ol>
+      <li>نحسب <span class="ltr">tan⁻¹(m)</span> بالآلة الحاسبة.</li>
+      <li>إذا كان الميل موجباً، فالناتج هو الزاوية.</li>
+      <li>إذا كان الميل سالباً، تعطي الآلة زاوية سالبة، فنضيف إليها <span class="ltr">180°</span>.</li>
+    </ol>
+    <div class="example"><span class="note">مثال</span><span><span class="ltr">m = −0.7  ⇒  tan⁻¹(−0.7) ≈ −35.0°</span></span><span><span class="ltr">α = −35.0° + 180° = 145.0°</span></span></div>
+    <h3>إذا أُعطيت معادلة المستقيم</h3>
+    <p>نجد الميل أولاً: في <span class="ltr">y = mx + b</span> هو معامل <span class="ltr">x</span>، وفي <span class="ltr">ax + by + c = 0</span> هو <span class="ltr">m = −a/b</span>. ثم نكمل كما في الحالة السابقة.</p>
+  </div>
+</section>
+
+<section class="practice" id="practice">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <h2>تدرّب</h2>
+    <p class="note">أسئلة جديدة في كل مرة. اختر نوع السؤال والمستوى.</p>
+  </div>
+  <div class="controls">
+    <div class="group"><span>نوع السؤال</span>
+      <div class="chips" id="type-chips">
+        <button class="chip" data-type="mix" aria-pressed="true">منوّع</button>
+        <button class="chip" data-type="a2m" aria-pressed="false">زاوية ← ميل</button>
+        <button class="chip" data-type="m2a" aria-pressed="false">ميل ← زاوية</button>
+        <button class="chip" data-type="eq" aria-pressed="false">معادلة ← زاوية</button>
+        <button class="chip" data-type="concept" aria-pressed="false">مفاهيم</button>
+      </div>
+    </div>
+    <div class="group"><span>المستوى</span>
+      <div class="chips" id="level-chips">
+        <button class="chip" data-level="easy" aria-pressed="true">زوايا خاصة</button>
+        <button class="chip" data-level="hard" aria-pressed="false">بالآلة الحاسبة</button>
+      </div>
+    </div>
+    <div class="score">
+      <div><span>صحيح</span><strong id="s-ok">0</strong></div>
+      <div><span>محاولات</span><strong id="s-all">0</strong></div>
+      <div><span>متتالية</span><strong id="s-streak">0</strong></div>
+    </div>
+  </div>
+
+  <div class="q-area">
+    <div class="q-card">
+      <span class="q-type" id="q-type"></span>
+      <div class="q-text" id="q-text"></div>
+      <form id="answer-form" class="answer-row" autocomplete="off">
+        <input id="answer" inputmode="text" aria-label="الإجابة" placeholder="">
+        <span class="unit" id="q-unit"></span>
+        <button class="btn" type="submit">تحقّق</button>
+        <button class="btn secondary" type="button" id="hint-btn">تلميح</button>
+      </form>
+      <div class="mc" id="mc" hidden></div>
+      <p class="tip" id="q-tip"></p>
+      <div class="hint" id="hint" hidden></div>
+      <div class="feedback" id="feedback" hidden></div>
+      <div class="answer-row"><button class="btn secondary" type="button" id="next-btn">سؤال جديد</button></div>
+    </div>
+    <div class="mini">
+      <canvas id="mini-canvas" aria-label="رسم المستقيم في السؤال"></canvas>
+      <p id="mini-cap">يظهر رسم المستقيم بعد الإجابة</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+const DEG = Math.PI/180;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt = (x,d=2) => { const r = Number(x.toFixed(d)); return (Object.is(r,-0)?0:r).toFixed(d).replace('-', '−'); };
+const L = s => `<span class="ltr">${s}</span>`;
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const angleOf = m => { let a = Math.atan(m)/DEG; return a < 0 ? a + 180 : a; };
+
+/* ---------- drawing ---------- */
+function setupCanvas(cv){
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  cv.width = Math.max(1, Math.round(r.width*dpr)); cv.height = Math.max(1, Math.round(r.height*dpr));
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w:r.width, h:r.height};
+}
+function drawPlane(cv, opts){
+  const {ctx,w,h} = setupCanvas(cv);
+  const units = opts.units || 6;
+  const s = Math.min(w,h)/(2*units+1);
+  const ox = opts.ox ?? w/2, oy = opts.oy ?? h/2;
+  const X = x => ox + x*s, Y = y => oy - y*s;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = css('--sheet'); ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = css('--grid'); ctx.lineWidth = 1;
+  for(let i=-30;i<=30;i++){
+    const gx = X(i), gy = Y(i);
+    if(gx>=0&&gx<=w){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,h);ctx.stroke();}
+    if(gy>=0&&gy<=h){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(w,gy);ctx.stroke();}
+  }
+  ctx.strokeStyle = css('--axis'); ctx.lineWidth = 1.5;
+  ctx.beginPath();ctx.moveTo(0,oy);ctx.lineTo(w,oy);ctx.moveTo(ox,0);ctx.lineTo(ox,h);ctx.stroke();
+  ctx.fillStyle = css('--muted'); ctx.font = '12px "JetBrains Mono", monospace';
+  ctx.fillText('x', w-12, oy-6); ctx.fillText('y', ox+6, 12);
+  return {ctx,w,h,s,X,Y,ox,oy};
+}
+function arrowLine(ctx, P, a, w, h){ // full line through P at angle a (deg)
+  const R = Math.hypot(w,h), dx = Math.cos(a*DEG), dy = -Math.sin(a*DEG);
+  ctx.beginPath(); ctx.moveTo(P.x - dx*R, P.y - dy*R); ctx.lineTo(P.x + dx*R, P.y + dy*R); ctx.stroke();
+}
+function angleArc(ctx, cx, cy, r, a, color, label){
+  ctx.strokeStyle = color; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, -a*DEG, true); ctx.stroke();
+  if(label){
+    const mid = a/2*DEG;
+    ctx.fillStyle = color; ctx.font = '600 14px "JetBrains Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(label, cx + Math.cos(mid)*(r+16), cy - Math.sin(mid)*(r+16));
+    ctx.textAlign = 'start'; ctx.textBaseline = 'alphabetic';
+  }
+}
+
+/* ---------- hero ---------- */
+const heroCv = document.getElementById('hero-canvas');
+const slider = document.getElementById('alpha');
+let alpha = 35;
+function drawHero(){
+  const p = drawPlane(heroCv, {units:5});
+  const {ctx,w,h,s,ox,oy} = p;
+  const a = alpha, r = 3.2;
+  const px = ox + Math.cos(a*DEG)*r*s, py = oy - Math.sin(a*DEG)*r*s;
+  if(a !== 90 && a !== 0){
+    ctx.setLineDash([]); ctx.strokeStyle = css('--leg'); ctx.lineWidth = 2.5;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(px,oy); ctx.lineTo(px,py); ctx.stroke();
+    ctx.fillStyle = css('--leg'); ctx.font = '600 13px "JetBrains Mono", monospace';
+    const dx = Math.cos(a*DEG)*r, dy = Math.sin(a*DEG)*r;
+    ctx.textAlign='center'; ctx.fillText('Δx = '+fmt(dx,2), (ox+px)/2, oy+18);
+    ctx.textAlign = dx>=0 ? 'left' : 'right';
+    ctx.fillText('Δy = '+fmt(dy,2), px + (dx>=0?6:-6), (oy+py)/2);
+    ctx.textAlign='start';
+  }
+  ctx.strokeStyle = css('--line'); ctx.lineWidth = 3;
+  arrowLine(ctx, {x:ox,y:oy}, a, w, h);
+  angleArc(ctx, ox, oy, Math.min(42, s*0.9), a, css('--line'), 'α');
+  ctx.fillStyle = css('--line'); ctx.beginPath(); ctx.arc(px,py,7,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle = css('--sheet'); ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2); ctx.fill();
+
+  document.getElementById('r-alpha').textContent = a + '°';
+  const m = Math.tan(a*DEG);
+  document.getElementById('r-m').textContent = a===90 ? '—' : fmt(m,2);
+  document.getElementById('r-type').textContent =
+    a===0 ? 'صفر · m = 0' : a===90 ? 'قائمة · غير معرّف' : a<90 ? 'حادة · m > 0' : 'منفرجة · m < 0';
+}
+slider.addEventListener('input', () => { alpha = +slider.value; drawHero(); });
+let dragging = false;
+function fromPointer(e){
+  const r = heroCv.getBoundingClientRect();
+  const x = e.clientX - r.left - r.width/2, y = r.height/2 - (e.clientY - r.top);
+  if(Math.hypot(x,y) < 6) return;
+  let a = Math.atan2(y,x)/DEG; if(a<0) a += 180; a = Math.round(a) % 180;
+  alpha = a; slider.value = a; drawHero();
+}
+heroCv.addEventListener('pointerdown', e => { dragging = true; try{heroCv.setPointerCapture(e.pointerId);}catch(_){} fromPointer(e); });
+heroCv.addEventListener('pointermove', e => { if(dragging) fromPointer(e); });
+heroCv.addEventListener('pointerup', () => dragging = false);
+heroCv.addEventListener('pointercancel', () => dragging = false);
+
+/* ---------- answer parsing ---------- */
+function parseNum(str){
+  if(!str) return NaN;
+  let t = String(str).trim()
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[٫,]/g,'.').replace(/[−–]/g,'-').replace(/[°\s]/g,'')
+    .replace(/sqrt\(?(\d+(?:\.\d+)?)\)?/gi,'√$1');
+  const term = s => {
+    let sign = 1; if(s.startsWith('-')){sign=-1;s=s.slice(1);} else if(s.startsWith('+')) s=s.slice(1);
+    const m = s.match(/^(\d*\.?\d*)?√(\d+(?:\.\d+)?)$/);
+    if(m){ const c = m[1]===''||m[1]===undefined ? 1 : parseFloat(m[1]); return sign*c*Math.sqrt(parseFloat(m[2])); }
+    if(/^\d*\.?\d+$|^\d+\.$/.test(s)) return sign*parseFloat(s);
+    return NaN;
+  };
+  if(t.includes('/')){
+    const [a,b] = t.split('/'); if(t.split('/').length!==2) return NaN;
+    return term(a)/term(b);
+  }
+  return term(t);
+}
+
+/* ---------- question generators ---------- */
+const SPECIAL_A = [
+  {a:0,  m:0,             t:'0'},
+  {a:30, m:1/Math.sqrt(3),t:'1/√3'},
+  {a:45, m:1,             t:'1'},
+  {a:60, m:Math.sqrt(3),  t:'√3'},
+  {a:120,m:-Math.sqrt(3), t:'−√3'},
+  {a:135,m:-1,            t:'−1'},
+  {a:150,m:-1/Math.sqrt(3),t:'−1/√3'},
+];
+const fracStr = (n,d) => { // reduced, sign in front
+  const g = (x,y)=> y ? g(y, x%y) : Math.abs(x); const k = g(n,d)||1;
+  n/=k; d/=k; if(d<0){n=-n;d=-d;}
+  return d===1 ? String(n).replace('-','−') : (n<0?'−':'') + Math.abs(n)+'/'+d;
+};
+function stepsAngleFromM(m, mText, d){
+  const raw = Math.atan(m)/DEG;
+  const st = [`${L('tan α = m = '+mText)}`];
+  if(m === 0){ st.push(`الميل صفر، إذن ${L('α = 0°')}`); return st; }
+  st.push(`${L('tan⁻¹('+mText+') ≈ '+fmt(raw,d)+'°')}`);
+  if(m < 0) st.push(`الميل سالب، فنضيف ${L('180°')}: ${L('α = '+fmt(raw,d)+'° + 180° = '+fmt(raw+180,d)+'°')}`);
+  else st.push(`الميل موجب، إذن ${L('α ≈ '+fmt(raw,d)+'°')}`);
+  return st;
+}
+const gens = {
+  a2m(level){
+    if(level==='easy'){
+      const s = pick(SPECIAL_A);
+      return {kind:'num', label:'من الزاوية إلى الميل', text:`زاوية ميل مستقيم هي ${L(s.a+'°')}. ما ميله؟`,
+        answer:s.m, tol:0.02, unit:'', tip:'يمكنك كتابة جذر هكذا: √3 أو 1/√3 أو عدداً عشرياً.',
+        hint:`استعمل ${L('m = tan '+s.a+'°')} وجدول الزوايا الخاصة.`,
+        steps:[L('m = tan '+s.a+'°'), `${L('m = '+s.t)}${s.m && Math.abs(s.m)!==1?' '+L('≈ '+fmt(s.m,2)):''}`],
+        draw:{a:s.a}};
+    }
+    let a; do{ a = rnd(5,175); }while(a>84&&a<96);
+    const m = Math.tan(a*DEG);
+    return {kind:'num', label:'من الزاوية إلى الميل', text:`زاوية ميل مستقيم هي ${L(a+'°')}. احسب ميله (لمنزلتين عشريتين).`,
+      answer:m, tol:0.015, unit:'', tip:'تأكد أن الآلة الحاسبة على وضع الدرجات DEG.',
+      hint: a>90 ? 'الزاوية منفرجة، فيجب أن يكون الميل سالباً.' : 'الزاوية حادة، فالميل موجب.',
+      steps:[L('m = tan '+a+'°'), L('m ≈ '+fmt(m,2))], draw:{a}};
+  },
+  m2a(level){
+    if(level==='easy'){
+      const s = pick(SPECIAL_A);
+      return {kind:'num', label:'من الميل إلى الزاوية', text:`ميل مستقيم هو ${L('m = '+s.t)}. ما زاوية ميله؟`,
+        answer:s.a, tol:0.6, unit:'°', tip:'اكتب الزاوية بالدرجات.',
+        hint: s.m<0 ? 'الميل سالب، فالزاوية منفرجة (بين 90° و180°).' : s.m===0 ? 'متى يكون المستقيم أفقياً؟' : 'الميل موجب، فالزاوية حادة.',
+        steps:[L('tan α = '+s.t), `من جدول الزوايا الخاصة: ${L('α = '+s.a+'°')}`], draw:{a:s.a}};
+    }
+    let m, mt;
+    if(Math.random()<0.5){ m = pick([-1,1]) * (rnd(1,40)/10); mt = fmt(m,1); }
+    else { let n=rnd(-9,9), d=rnd(2,7); if(n===0) n=1; m=n/d; mt=fracStr(n,d); if(!mt.includes('/')) mt=fmt(m,0); }
+    const a = angleOf(m);
+    return {kind:'num', label:'من الميل إلى الزاوية', text:`ميل مستقيم هو ${L('m = '+mt)}. احسب زاوية ميله (لمنزلة عشرية واحدة).`,
+      answer:a, tol:0.15, unit:'°', tip:'تذكّر: إذا كانت الآلة تعطي زاوية سالبة فأضف 180°.',
+      hint:`احسب ${L('tan⁻¹('+mt+')')}${m<0?' ثم أضف 180° لأن الميل سالب.':'.'}`,
+      steps:stepsAngleFromM(m, mt, 1), draw:{a}};
+  },
+  pts(level){
+    let dx, dy;
+    if(level==='easy'){
+      const opt = pick([[1,1],[1,-1],[1,0],[2,2],[3,-3],[2,0],[4,4],[2,-2]]);
+      const k = pick([1,2]); dx = opt[0]*k*pick([1,-1]); dy = opt[1]*k*Math.sign(dx);
+    } else {
+      do{ dx = rnd(-6,6); dy = rnd(-7,7); }while(dx===0 || dy===0 || Math.abs(dy)===Math.abs(dx));
+    }
+    const x1 = rnd(-4,3), y1 = rnd(-4,3), x2 = x1+dx, y2 = y1+dy;
+    const m = dy/dx, a = angleOf(m), d = level==='easy'?0:1;
+    const P = (x,y)=>`(${String(x).replace('-','−')}, ${String(y).replace('-','−')})`;
+    const sub = (a,b)=> b<0 ? `${a} + ${-b}` : `${a} − ${b}`;
+    const mt = fracStr(dy,dx);
+    const steps = [L(`m = (${sub(y2,y1)}) / (${sub(x2,x1)}) = ${fracStr(dy,1)}/${fracStr(dx,1)} = ${mt}`.replace(/-/g,'−'))]
+      .concat(stepsAngleFromM(m, mt, d));
+    return {kind:'num', label:'من نقطتين إلى الزاوية',
+      text:`مستقيم يمر بالنقطتين ${L('A'+P(x1,y1))} و ${L('B'+P(x2,y2))}. احسب زاوية ميله${d?' (لمنزلة عشرية واحدة)':''}.`,
+      answer:a, tol: d?0.15:0.6, unit:'°', tip:'ابدأ بحساب الميل من النقطتين.',
+      hint:`${L('m = (y₂ − y₁) / (x₂ − x₁)')} ثم ${L('α = tan⁻¹(m)')}.`,
+      steps, draw:{a, pts:[[x1,y1],[x2,y2]]}};
+  },
+  eq(level){
+    if(level==='easy'){
+      const s = pick(SPECIAL_A.filter(z=>z.a!==0));
+      const b = rnd(-5,5); const mStr = s.t==='1'?'':s.t==='−1'?'−':s.t;
+      const right = `${mStr==='1/√3'?'(1/√3)':mStr==='−1/√3'?'−(1/√3)':mStr}x${b? (b>0?' + '+b:' − '+(-b)) : ''}`;
+      return {kind:'num', label:'من معادلة إلى الزاوية', text:`ما زاوية ميل المستقيم ${L('y = '+right)}؟`,
+        answer:s.a, tol:0.6, unit:'°', tip:'الميل هو معامل x في الصيغة y = mx + b.',
+        hint:`الميل هنا ${L('m = '+s.t)}.`,
+        steps:[`الميل هو معامل ${L('x')}: ${L('m = '+s.t)}`, `من جدول الزوايا الخاصة: ${L('α = '+s.a+'°')}`], draw:{a:s.a, b}};
+    }
+    let A,B,C; do{ A=rnd(-6,6); B=rnd(-6,6); C=rnd(-9,9);}while(A===0||B===0);
+    const m = -A/B, a = angleOf(m);
+    const term = (k,v,first)=>{ if(k===0) return ''; const sg = k<0?'−':(first?'':'+'); const ab=Math.abs(k);
+      return (first? (k<0?'−':'') : ' '+sg+' ') + (ab===1&&v?'':ab) + v; };
+    const eqs = term(A,'x',true)+term(B,'y',false)+term(C,'',false)+' = 0';
+    const mt = fracStr(-A,B);
+    return {kind:'num', label:'من معادلة إلى الزاوية', text:`احسب زاوية ميل المستقيم ${L(eqs)} (لمنزلة عشرية واحدة).`,
+      answer:a, tol:0.15, unit:'°', tip:'في الصيغة ax + by + c = 0 يكون الميل m = −a/b.',
+      hint:`هنا ${L('a = '+String(A).replace('-','−'))} و ${L('b = '+String(B).replace('-','−'))}.`,
+      steps:[L(`m = −a/b = −(${String(A).replace('-','−')})/(${String(B).replace('-','−')}) = ${mt}`)].concat(stepsAngleFromM(m, mt, 1)),
+      draw:{a, b:-C/B}};
+  },
+  concept(){
+    const kinds = ['signFromAngle','typeFromSlope','steeper'];
+    const k = pick(kinds);
+    if(k==='signFromAngle'){
+      const a = pick([0,90, rnd(5,85), rnd(95,175), rnd(95,175), rnd(5,85)]);
+      const ans = a===0?'صفر':a===90?'غير معرّف':a<90?'موجب':'سالب';
+      return {kind:'mc', label:'مفاهيم', text:`زاوية ميل مستقيم هي ${L(a+'°')}. ما إشارة ميله؟`,
+        options:['موجب','سالب','صفر','غير معرّف'], answer:ans,
+        hint:'هل الزاوية حادة أم منفرجة أم صفر أم قائمة؟',
+        steps:[a===0?'الزاوية صفر: المستقيم أفقي وميله صفر.':a===90?'الزاوية قائمة: المستقيم عمودي وميله غير معرّف.':a<90?'الزاوية حادة، لذلك الميل موجب.':'الزاوية منفرجة، لذلك الميل سالب.'],
+        draw:{a}};
+    }
+    if(k==='typeFromSlope'){
+      const m = pick([0, rnd(1,30)/10, -rnd(1,30)/10, -rnd(1,30)/10, rnd(1,30)/10]);
+      const ans = m===0?'صفر':m>0?'حادة':'منفرجة';
+      return {kind:'mc', label:'مفاهيم', text:`ميل مستقيم هو ${L('m = '+fmt(m,1))}. ما نوع زاوية ميله؟`,
+        options:['حادة','منفرجة','صفر','قائمة'], answer:ans,
+        hint:'انظر إلى إشارة الميل.',
+        steps:[m===0?'الميل صفر، فالمستقيم أفقي وزاويته 0°.':m>0?'الميل موجب، فالزاوية حادة.':'الميل سالب، فالزاوية منفرجة.'],
+        draw:{a:angleOf(m)}};
+    }
+    // steeper: which line is steeper (bigger |m|)
+    let a1,a2; do{ a1=rnd(10,80); a2=rnd(10,80);}while(Math.abs(a1-a2)<8);
+    if(Math.random()<0.5) a2 = 180-a2;
+    const s1 = Math.abs(Math.tan(a1*DEG)), s2 = Math.abs(Math.tan(a2*DEG));
+    const ans = s1>s2 ? 'المستقيم الأول' : 'المستقيم الثاني';
+    return {kind:'mc', label:'مفاهيم',
+      text:`زاوية ميل المستقيم الأول ${L(a1+'°')} وزاوية ميل المستقيم الثاني ${L(a2+'°')}. أيهما أشدّ انحداراً؟`,
+      options:['المستقيم الأول','المستقيم الثاني'], answer:ans,
+      hint:'الأشد انحداراً هو صاحب القيمة المطلقة الأكبر للميل.',
+      steps:[`${L('|tan '+a1+'°| ≈ '+fmt(s1,2))} و ${L('|tan '+a2+'°| ≈ '+fmt(s2,2))}`, `إذن ${ans} أشد انحداراً.`],
+      draw:{a:a1, a2}};
+  }
+};
+
+/* ---------- practice UI ---------- */
+let type = 'mix', level = 'easy', q = null, answered = false;
+let ok = 0, all = 0, streak = 0;
+const $ = id => document.getElementById(id);
+const els = {type:$('q-type'), text:$('q-text'), form:$('answer-form'), input:$('answer'), unit:$('q-unit'),
+  mc:$('mc'), tip:$('q-tip'), hint:$('hint'), fb:$('feedback'), mini:$('mini-canvas'), cap:$('mini-cap')};
+
+function setChips(groupId, attr, val){
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset[attr]===val ? 'true':'false'));
+}
+$('type-chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if(!c) return; type = c.dataset.type; setChips('type-chips','type',type); newQ(); });
+$('level-chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if(!c) return; level = c.dataset.level; setChips('level-chips','level',level); newQ(); });
+
+function drawMini(){
+  const p = drawPlane(els.mini, {units:6});
+  const {ctx,w,h,s,X,Y,ox,oy} = p;
+  if(!q || !answered){ return; }
+  const d = q.draw;
+  const lines = [{a:d.a, b:d.b||0, color:css('--line')}];
+  if(d.a2!==undefined) lines.push({a:d.a2, b:0, color:css('--leg')});
+  lines.forEach(ln => {
+    let P;
+    if(d.pts && ln===lines[0]){ P = {x:X(d.pts[0][0]), y:Y(d.pts[0][1])}; }
+    else P = {x:ox, y:Y(ln.b)};
+    ctx.strokeStyle = ln.color; ctx.lineWidth = 3; arrowLine(ctx, P, ln.a, w, h);
+    // x-intercept for arc
+    let ix = ox, iy = oy;
+    if(ln.a !== 0 && ln.a !== 90){
+      const m = Math.tan(ln.a*DEG);
+      const by = d.pts && ln===lines[0] ? d.pts[0][1] - m*d.pts[0][0] : ln.b;
+      ix = X(-by/m);
+    } else if(ln.a===0){ return; }
+    else if(d.pts){ ix = X(d.pts[0][0]); }
+    if(ix > 10 && ix < w-10) angleArc(ctx, ix, iy, 26, ln.a, ln.color, Math.round(ln.a)+'°');
+  });
+  if(d.pts){
+    ctx.fillStyle = css('--leg');
+    d.pts.forEach(([x,y],i) => { ctx.beginPath(); ctx.arc(X(x),Y(y),5,0,Math.PI*2); ctx.fill();
+      ctx.font='600 12px "JetBrains Mono", monospace'; ctx.fillText(i?'B':'A', X(x)+7, Y(y)-7); });
+  }
+}
+
+function newQ(){
+  const t = type==='mix' ? pick(['a2m','m2a','eq','concept','m2a','a2m']) : type;
+  q = gens[t](level); answered = false;
+  els.type.textContent = q.label + (t!=='concept' ? (level==='easy' ? ' · زوايا خاصة' : ' · آلة حاسبة') : '');
+  els.text.innerHTML = q.text;
+  els.hint.hidden = true; els.fb.hidden = true; els.fb.className = 'feedback';
+  els.cap.textContent = 'يظهر رسم المستقيم بعد الإجابة';
+  if(q.kind==='mc'){
+    els.form.hidden = true; els.mc.hidden = false; els.tip.textContent = '';
+    els.mc.innerHTML = q.options.map(o => `<button type="button">${o}</button>`).join('');
+  } else {
+    els.form.hidden = false; els.mc.hidden = true;
+    els.input.value = ''; els.input.style.borderColor = '';
+    els.unit.textContent = q.unit; els.tip.textContent = q.tip || '';
+    els.input.placeholder = q.unit==='°' ? 'مثلاً 63.4' : 'مثلاً −1.73';
+  }
+  drawMini();
+}
+
+function finish(correct, given){
+  if(!answered){ all++; if(correct){ ok++; streak++; } else streak = 0; }
+  answered = true;
+  $('s-ok').textContent = ok; $('s-all').textContent = all; $('s-streak').textContent = streak;
+  els.fb.hidden = false;
+  els.fb.className = 'feedback ' + (correct ? 'ok' : 'bad');
+  const ansText = q.kind==='mc' ? q.answer : L(fmt(q.answer, q.unit==='°' ? 1 : 2) + q.unit);
+  els.fb.innerHTML = `<strong>${correct ? 'إجابة صحيحة' : 'ليست صحيحة'}</strong>`
+    + (correct ? '' : `<span>الإجابة الصحيحة: ${ansText}</span>`)
+    + `<ol class="steps">${q.steps.map(s=>`<li>${s}</li>`).join('')}</ol>`;
+  els.cap.textContent = q.draw.a2!==undefined ? 'المستقيم الأول بالبرتقالي والثاني بالأزرق' : 'رسم المستقيم وزاوية ميله';
+  drawMini();
+}
+
+els.form.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = parseNum(els.input.value);
+  if(isNaN(v)){ els.input.style.borderColor = 'var(--bad)'; els.tip.textContent = 'اكتب عدداً، مثل 1.73 أو √3 أو 3/4.'; return; }
+  els.input.style.borderColor = '';
+  finish(Math.abs(v - q.answer) <= q.tol, v);
+});
+els.mc.addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b || answered) return;
+  const correct = b.textContent === q.answer;
+  [...els.mc.children].forEach(x => { if(x.textContent===q.answer) x.classList.add('right'); });
+  if(!correct) b.classList.add('wrong');
+  finish(correct);
+});
+$('hint-btn').addEventListener('click', () => { els.hint.innerHTML = q.hint; els.hint.hidden = false; });
+$('next-btn').addEventListener('click', () => { newQ(); if(!els.form.hidden) els.input.focus({preventScroll:true}); });
+
+/* ---------- init & theme/resize ---------- */
+function redrawAll(){ drawHero(); drawMini(); }
+let rT; window.addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(redrawAll, 80); });
+try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll); }catch(_){}
+new MutationObserver(redrawAll).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+newQ();
+// show the first example fully: keep the question unanswered, draw hero
+redrawAll();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(redrawAll);
+})();
+</script>
+
+</html>
